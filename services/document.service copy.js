@@ -18,7 +18,7 @@ const uploadDocument = (req, res) => {
       return res.status(500).json({ error: 'Error saving document details', message: err.message });
     }
 
-    return res.status(200).json({ message: 'File uploaded successfully', pdfUrl: savedDocument.pdfUrl });
+    return res.status(200).json({ message: 'Document uploaded successfully', pdfUrl: savedDocument.pdfUrl });
   });
 };
 
