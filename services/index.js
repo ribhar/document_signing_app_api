@@ -1,0 +1,1 @@
+module.exports.documentService = require('./document.service')
