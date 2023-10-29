@@ -1,15 +1,20 @@
 const multer = require("multer");
 const path = require("path");
 const { PDFDocument, rgb, StandardFonts } = require("pdf-lib");
+const axios = require('axios');
 const fs = require("fs");
 const { documentModel } = require("../models");
+
+
+
+
 
 const uploadDocument = async (req, res) => {
   try {
 
     const document = new documentModel({
       ownerId: req.userData.id,
-      docUrl: `${req.file.filename}`,
+      unsignedDocUrl: `${req.file.path}`,
     });
 
     const savedDocument = await document.save();
@@ -31,17 +36,37 @@ const uploadDocument = async (req, res) => {
 
 const signDocument = async (req, res) => {
   try {
-    const { name, email, signature, pdfId } = req.body;
+    const { name, email } = req.body;
+    const { id } = req.params;
+    const signature = req.file;
 
-    const document = await documentModel.findById(pdfId);
+    
+
+    const document = await documentModel.findById(id); 
 
     if (!document) {
       return res.status(404).json({ error: 'Document not found' });
     }
 
-    const { docUrl } = document;
+    const { unsignedDocUrl } = document;
 
-    const pdfDocBytes = fs.readFileSync(`./uploads/${docUrl}`);
+    const pdfUrl = unsignedDocUrl;
+
+    // Download the PDF to a local file
+    const localPdfPath = 'temp.pdf';
+    const pdfStream = fs.createWriteStream(localPdfPath);
+    const request = require('https').get(pdfUrl, (response) => {
+      response.pipe(pdfStream);
+      console.log(response.pipe(pdfStream))
+      response.on('end', () => {
+        pdfStream.close();
+        // Read the downloaded PDF
+        // readPDF(localPdfPath);
+     });
+})
+
+    const response = await axios.get(unsignedDocUrl, { responseType: 'arraybuffer' });
+    const pdfDocBytes = response.data;
 
     const pdfDoc = await PDFDocument.load(pdfDocBytes);
     const page = pdfDoc.getPage(0);
@@ -64,7 +89,7 @@ const signDocument = async (req, res) => {
       color: rgb(0, 0, 0),
     });
 
-    const signatureImage = await pdfDoc.embedPng(signature); // Embed the signature image
+    const signatureImage = await pdfDoc.embedPng(fs.readFileSync(signature.path)); // Embed the signature image
 
     page.drawImage(signatureImage, {
       x: 50,
@@ -75,22 +100,29 @@ const signDocument = async (req, res) => {
 
     const modifiedPdfBytes = await pdfDoc.save(); // Save the modified PDF as bytes
 
-    const newDocUrl = docUrl.replace(/\.pdf$/, '_signed.pdf'); // add _signed to document's name.
-    fs.writeFileSync(`./uploads/${newDocUrl}`, modifiedPdfBytes);
+    const signedDocName = new Date().getTime()
+
+    const cloudinaryResponse = await cloudinary.uploader.upload(modifiedPdfBytes, {
+      folder: config.cloudinary.docMediaPath,
+      public_id: signedDocName,  
+      unique_filename: true,
+      resource_type: "auto",
+    });
 
     // Save document details to the Document model
-    const updatedDocument = await documentModel.findOneAndUpdate(
-      { _id: pdfId },
+    await documentModel.findOneAndUpdate(
+      { _id: docId }, // Updating the document with docId
       {
         name,
         email,
         isSigned: true,
-        signedDocUrl: `/uploads/${newDocUrl}`,
+        signatureUrl: req.file.path, 
+        signedDocUrl: cloudinaryResponse.secure_url, 
       },
       { new: true }
     );
 
-    const signedPdf = fs.readFileSync(`./uploads/${newDocUrl}`);
+    const signedPdf = modifiedPdfBytes; // Use modified PDF bytes
     res.contentType('application/pdf');
     res.send(signedPdf);
   } catch (error) {
@@ -98,6 +130,5 @@ const signDocument = async (req, res) => {
     return res.status(500).json({ error: 'Error signing document', message: error.message });
   }
 };
-
 
 module.exports = { uploadDocument, signDocument };

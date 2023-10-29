@@ -16,7 +16,15 @@ const envVarsSchema = Joi.object()
     JWT_SECRET: Joi.string().required().description("JWT secret key"),
     JWT_SECRET_EXPIRY: Joi.string().required().description("JWT secret key"),
 
+    // Misc
     SESSION_SECRET: Joi.string().required().description("session secret key"),
+    
+    // Cloudinary
+    CLOUDINARY_CLOUD_NAME: Joi.string().required().description("Cloudinary cloud name"),
+    CLOUDINARY_API_KEY: Joi.string().required().description("Cloudinary api key"),
+    CLOUDINARY_API_SECRET: Joi.string().required().description("Cloudinary secret"),
+    CLOUDINARY_DOC_MEDIA_PATH: Joi.string().required().description("Cloudinary media base path"),
+
   })
   .unknown();
 
@@ -35,6 +43,12 @@ module.exports = {
   jwt: {
     secret: envVars.JWT_SECRET,
     secretExpiry: envVars.JWT_SECRET_EXPIRY,
+  },
+  cloudinary: {
+    cloudName: envVars.CLOUDINARY_CLOUD_NAME,
+    key: envVars.CLOUDINARY_API_KEY,
+    secret: envVars.CLOUDINARY_API_SECRET,
+    docMediaPath: envVars.CLOUDINARY_DOC_MEDIA_PATH,
   },
   misc: {
     sessionSecret: envVars.SESSION_SECRET,

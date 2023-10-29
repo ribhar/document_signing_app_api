@@ -1,12 +1,9 @@
 const multer = require("multer");
-const {cloudinary} = require('../configs/cloudinary')
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const config = require("../configs/config");
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: `${config.cloudinary.docMediaPath}`,
+    folder: "uploads",
     format: async (req, file) => {
       if (file.mimetype === "application/pdf") {
         return "pdf";
@@ -20,8 +17,7 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage: storage, limits: { fileSize: 5242880 } });
+const uploadSingleFile = multer({ storage: storage });
+const validateformdata = multer().none();
 
-
-
-module.exports = { upload };
+module.exports = { uploadSingleFile, validateformdata };

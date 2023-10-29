@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const documentSchema = new mongoose.Schema({
-  name: {
+  signatoryName: {
     type: String,
     // required: true,
   },
-  email: {
+  signatoryEmail: {
     type: String,
     // required: true,
   },
@@ -18,7 +18,11 @@ const documentSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  docUrl: {
+  unsignedDocUrl: {
+    type: String,
+    required: true,
+  },
+  signatureUrl: {
     type: String,
   },
   signedDocUrl: {
