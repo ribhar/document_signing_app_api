@@ -46,6 +46,7 @@ const uploadS3Object = async (object) => {
       Key: `${config.aws.docMediaPath}/${signedDocName}`,
       Body: object,
       ACL: 'public-read', // Allow public read access
+      contentType : 'application/pdf'
     };
 
     const s3UploadResponse = await s3.upload(params).promise();

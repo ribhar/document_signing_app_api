@@ -86,7 +86,7 @@ const signDocument = async (req, res) => {
 
     const s3SignatureParams = {
       Bucket: config.aws.bucket,
-      Key: signature.key, // Assuming the signature is the key to the signature image in the S3 bucket
+      Key: signature.key, 
     };
 
     const s3SignatureObject = await s3.getObject(s3SignatureParams).promise();
@@ -99,19 +99,9 @@ const signDocument = async (req, res) => {
       height: 90,
     });
 
-    const modifiedPdfBytes = await pdfDoc.save(); // Save the modified PDF as bytes
-
-    // const timestamp = Date.now();
-    // const newKey = `document_${timestamp}`; // Example key format, you can modify it as needed
-
-    // const s3UploadParams = {
-    //   Bucket: config.aws.bucket,
-    //   Key: newKey,
-    //   Body: modifiedPdfBytes,
-    // };
+    const modifiedPdfBytes = await pdfDoc.save(); 
 
     const s3Response = await uploadS3Object(modifiedPdfBytes)
-    const s3ObjectLocation = s3Response.Location; 
 
     // Save document details to the Document model
     await documentModel.findOneAndUpdate(
