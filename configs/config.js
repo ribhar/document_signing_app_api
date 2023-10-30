@@ -25,6 +25,14 @@ const envVarsSchema = Joi.object()
     CLOUDINARY_API_SECRET: Joi.string().required().description("Cloudinary secret"),
     CLOUDINARY_DOC_MEDIA_PATH: Joi.string().required().description("Cloudinary media base path"),
 
+    // AWS
+    AWS_ACCESS_KEY_ID: Joi.string().required(),
+    AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+    AWS_DEFAULT_REGION: Joi.string().required(),
+    AWS_BUCKET: Joi.string().required(),
+    // AWS_BUCKET_BASE_URL: Joi.string().required(),
+    AWS_DOC_MEDIA_PATH: Joi.string().required(),
+
   })
   .unknown();
 
@@ -49,6 +57,14 @@ module.exports = {
     key: envVars.CLOUDINARY_API_KEY,
     secret: envVars.CLOUDINARY_API_SECRET,
     docMediaPath: envVars.CLOUDINARY_DOC_MEDIA_PATH,
+  },
+  aws: {
+    accessKeyId: envVars.AWS_ACCESS_KEY_ID,
+    secretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
+    defaultRegion: envVars.AWS_DEFAULT_REGION,
+    bucket: envVars.AWS_BUCKET,
+    // bucketBaseUrl: envVars.AWS_BUCKET_BASE_URL,
+    docMediaPath: envVars.AWS_DOC_MEDIA_PATH,
   },
   misc: {
     sessionSecret: envVars.SESSION_SECRET,

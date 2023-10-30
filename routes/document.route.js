@@ -4,6 +4,8 @@ const { documentValidation } = require("../validations/");
 const jwtVerify = require("../middlewares/jwtVerify");
 const validate = require("../middlewares/validate");
 const {upload} = require("../middlewares/multer");
+const { limits, path, fileName, validateImage} = require("../validations/common.validations");
+const { uploadTOS3 } = require("../middlewares/s3-middleware");
 
 const router = express.Router();
 
@@ -11,7 +13,10 @@ const router = express.Router();
 // router.post("/upload-test", async (req, res, next) => {
 //   try {
 //     console.log(req.body.filename)
-//     upload.single("file")(req, res, (err) => {
+//     uploadTOS3({
+//       limits: limits.unsignedDoc,
+//       fileFilter: validateImage,
+//     }).single(fileName.unsignedDoc)(req, res, (err) => {
 //       if (err) {
 //         console.error(err);
 //         return res.status(500).json({ message: "upload failed" });
@@ -20,11 +25,12 @@ const router = express.Router();
 //     });
 //   } catch (err) {
 //     console.error(err);
-//     return res.status(500).json({ message: "upload failed" });
+//     return res.status(500).json({ message: "upload failed",err });
 //   }
 // }, async (req, res) => {
 //   try {
 //     const file = req.file;
+    
 //     return res.status(201).json({
 //       status: 200,
 //       message: "User registered successfully.",
@@ -35,19 +41,32 @@ const router = express.Router();
 //   }
 // });
 
+// router.post(
+//   "/upload",
+//   jwtVerify.verifyToken,
+//   validate(documentValidation.uploadDocument),
+//   upload.single("file"),
+//   documentController.uploadDocument
+// );
+
 router.post(
   "/upload",
   jwtVerify.verifyToken,
-  validate(documentValidation.uploadDocument),
-  upload.single("file"),
+  // validate(documentValidation.uploadDocument),
+  uploadTOS3({
+    limits: limits.unsignedDoc,
+    fileFilter: validateImage,
+  }).single(fileName.unsignedDoc),
   documentController.uploadDocument
 );
 
 router.post(
   "/sign/:id",
   jwtVerify.verifyToken,
-  upload.single("signature"),
-  // validate(documentValidation.signDocument),
+  uploadTOS3({
+    limits: limits.signature,
+    fileFilter: validateImage,
+  }).single(fileName.signature),
   documentController.signDocument
 );
 
