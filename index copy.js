@@ -9,12 +9,6 @@ const config = require("./configs/config");
 
 const app = express();
 
-// // Serve static files from the uploads directory
-// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Use cors middleware
-app.use(cors());
-
 // Use express-session middleware
 app.use(
   session({
@@ -24,15 +18,17 @@ app.use(
   })
 );
 
-// Use passport middleware
+app.use(express.json());
+// parse urlencoded request body
+app.use(express.urlencoded({ extended: true }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Parse JSON request body
-app.use(express.json());
+app.use(cors());
 
-// Parse urlencoded request body
-app.use(express.urlencoded({ extended: true }));
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api", router);
 
