@@ -1,10 +1,13 @@
 const multer = require("multer");
+const { URL } = require('url');
 const path = require("path");
 const { PDFDocument, rgb, StandardFonts } = require("pdf-lib");
 const axios = require('axios');
 const fs = require("fs");
 const { documentModel } = require("../models");
 const { deleteFileFromS3, uploadS3Object } = require("../middlewares/s3-middleware");
+const config = require("../configs/config");
+const s3 = require("../configs/s3");
 
 
 const uploadDocument = async (req, res) => {
@@ -51,10 +54,14 @@ const signDocument = async (req, res) => {
 
     const { unsignedDocUrl } = document;
 
-    const response = await axios.get(unsignedDocUrl, {
-      responseType: 'arraybuffer', // Get the S3 object as an array buffer
-    });
-    const pdfDocBytes = response.data;
+    const url = new URL(unsignedDocUrl);
+    const s3Params = {
+      Bucket: config.aws.bucket,
+      Key: decodeURIComponent(url.pathname.substr(1)), // Extract the key from the pathname
+    };
+
+    const s3PdfObject = await s3.getObject(s3Params).promise();
+    const pdfDocBytes = s3PdfObject.Body;
 
     const pdfDoc = await PDFDocument.load(pdfDocBytes);
     const page = pdfDoc.getPage(0);
@@ -77,13 +84,13 @@ const signDocument = async (req, res) => {
       color: rgb(0, 0, 0),
     });
 
-    const signatureImageResponse = await axios.get(signature.location
-      , {
-      responseType: 'arraybuffer', // Get the S3 object as an array buffer
-    }
-    );
-    const signatureImageBytes = signatureImageResponse.data;
-    const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
+    const s3SignatureParams = {
+      Bucket: config.aws.bucket,
+      Key: signature.key, // Assuming the signature is the key to the signature image in the S3 bucket
+    };
+
+    const s3SignatureObject = await s3.getObject(s3SignatureParams).promise();
+    const signatureImage = await pdfDoc.embedPng(s3SignatureObject.Body); // Embed the signature image
 
     page.drawImage(signatureImage, {
       x: 50,
@@ -94,7 +101,17 @@ const signDocument = async (req, res) => {
 
     const modifiedPdfBytes = await pdfDoc.save(); // Save the modified PDF as bytes
 
-    const signedDocUrl = await uploadS3Object(modifiedPdfBytes)
+    // const timestamp = Date.now();
+    // const newKey = `document_${timestamp}`; // Example key format, you can modify it as needed
+
+    // const s3UploadParams = {
+    //   Bucket: config.aws.bucket,
+    //   Key: newKey,
+    //   Body: modifiedPdfBytes,
+    // };
+
+    const s3Response = await uploadS3Object(modifiedPdfBytes)
+    const s3ObjectLocation = s3Response.Location; 
 
     // Save document details to the Document model
     await documentModel.findOneAndUpdate(
@@ -104,11 +121,11 @@ const signDocument = async (req, res) => {
         email,
         isSigned: true,
         signatureUrl: signature.location, 
-        signedDocUrl, 
+        signedDocUrl: s3Response, 
       },
       { new: true }
     ).catch(async (error) => {
-      await deleteFileFromS3(signedDocUrl);
+      await deleteFileFromS3(s3Response);
       return res.status(500).json({ error: 'Error saving document url', message: error.message });
     });
 
