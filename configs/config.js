@@ -20,8 +20,8 @@ const envVarsSchema = Joi.object()
     SESSION_SECRET: Joi.string().required().description("session secret key"),
 
     // AWS
-    AWS_ACCESS_KEY_ID: Joi.string().required(),
-    AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+    AWS_ACCESS_KEY_ID_: Joi.string().required(),
+    AWS_SECRET_ACCESS_KEY_: Joi.string().required(),
     AWS_DEFAULT_REGION: Joi.string().required(),
     AWS_BUCKET: Joi.string().required(),
     // AWS_BUCKET_BASE_URL: Joi.string().required(),
@@ -47,8 +47,8 @@ module.exports = {
     secretExpiry: envVars.JWT_SECRET_EXPIRY,
   },
   aws: {
-    accessKeyId: envVars.AWS_ACCESS_KEY_ID,
-    secretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: envVars.AWS_ACCESS_KEY_ID_,
+    secretAccessKey: envVars.AWS_SECRET_ACCESS_KEY_,
     defaultRegion: envVars.AWS_DEFAULT_REGION,
     bucket: envVars.AWS_BUCKET,
     // bucketBaseUrl: envVars.AWS_BUCKET_BASE_URL,
