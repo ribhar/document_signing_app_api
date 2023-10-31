@@ -29,10 +29,10 @@ router.post(
 );
 
 router.get(
-  "/:id",
+  "/search",
   jwtVerify.verifyToken,
   validate(documentValidation.getSignedDocument),
-  documentController.getSignedDocumentById
+  documentController.getSignedDocumentByQuery
 );
 
 router.get(

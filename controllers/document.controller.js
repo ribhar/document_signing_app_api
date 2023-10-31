@@ -9,22 +9,23 @@ const signDocument = (req, res) => {
   documentService.signDocument(req, res);
 };
 
-const getSignedDocumentById = async (req, res) => {
+const getSignedDocumentByQuery = async (req, res) => {
   try {
-    const userId = req.userData.id; 
-    const documentId = req.params.id;
-    const signedDocument = await documentModel.findOne({ _id: documentId, ownerId: userId, isSigned: true }); 
+    const userId = req.userData.id;
+    const docNameQuery = req.query.search; 
+    const signedDocuments = await documentModel.find({ ownerId: userId, isSigned: true, docName: { $regex: docNameQuery, $options: 'i' } });
 
-    if (!signedDocument) {
-      return res.status(404).json({ message: 'Document not found or not signed by the user' });
+    if (!signedDocuments || signedDocuments.length === 0) {
+      return res.status(404).json({ message: 'No signed documents found for the provided query' });
     }
 
-    res.json(signedDocument);
+    res.json(signedDocuments);
   } catch (error) {
-    console.error('Error fetching signed document:', error);
-    return res.status(500).json({ error: 'Error fetching signed document', message: error.message });
+    console.error('Error fetching signed documents:', error);
+    return res.status(500).json({ error: 'Error fetching signed documents', message: error.message });
   }
 };
+
 
 
 const getAllSignedDocuments = async (req, res) => {
@@ -41,6 +42,6 @@ const getAllSignedDocuments = async (req, res) => {
 module.exports = {
   uploadDocument,
   signDocument,
-  getSignedDocumentById,
+  getSignedDocumentByQuery,
   getAllSignedDocuments
 };
