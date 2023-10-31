@@ -100,8 +100,9 @@ const signDocument = async (req, res) => {
     });
 
     const modifiedPdfBytes = await pdfDoc.save(); 
+    const modifiedPdfBase64 = Buffer.from(modifiedPdfBytes).toString('base64');
 
-    const s3Response = await uploadS3Object(modifiedPdfBytes)
+    const s3Response = await uploadS3Object(modifiedPdfBase64)
 
     // Save document details to the Document model
     await documentModel.findOneAndUpdate(
@@ -119,7 +120,7 @@ const signDocument = async (req, res) => {
       return res.status(500).json({ error: 'Error saving document url', message: error.message });
     });
 
-    const signedPdf = modifiedPdfBytes; // Use modified PDF bytes
+    const signedPdf = Buffer.from(modifiedPdfBase64, 'base64');
     res.contentType('application/pdf');
     res.send(signedPdf);
   } catch (error) {
