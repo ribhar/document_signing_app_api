@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 const documentSchema = new mongoose.Schema({
-  signatoryName: {
+  name: {
     type: String,
   },
-  signatoryEmail: {
+  email: {
     type: String,
   },
   ownerId: {
