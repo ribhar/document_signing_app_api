@@ -5,7 +5,7 @@ const s3 = require("../configs/s3");
 const config = require("../configs/config");
 
 // Function to upload to S3
-const uploadTOS3 = (uploadConfig) =>
+const uploadToS3 = (uploadConfig) =>
   multer({
     limits: uploadConfig.limits,
     fileFilter: uploadConfig.fileFilter,
@@ -59,4 +59,4 @@ const uploadS3Object = async (base64Data) => {
 
 
 
-module.exports = { uploadTOS3, deleteFileFromS3 , uploadS3Object};
+module.exports = { uploadToS3, deleteFileFromS3 , uploadS3Object};

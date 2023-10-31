@@ -24,14 +24,15 @@ const signDocument = {
   }),
 };
 
-const getSignedDocument = {
-  params: Joi.object().keys({
-    id: Joi.string().required(),
-  }),
+const getSignedDocumentByQuery = {
+  query: Joi.object().keys({
+    search: Joi.string().required(),
+  }).unknown(true), 
 };
+
 
 module.exports = {
   uploadDocument,
   signDocument,
-  getSignedDocument,
+  getSignedDocumentByQuery,
 };
