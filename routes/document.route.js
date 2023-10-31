@@ -13,7 +13,6 @@ router.post(
   jwtVerify.verifyToken,
   uploadToS3({
     limits: limits.unsignedDoc,
-    path: path.unsignedDoc,
     fileFilter: validateImage,
   }).single(fileName.unsignedDoc),
   documentController.uploadDocument
