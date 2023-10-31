@@ -7,6 +7,10 @@ const documentSchema = new mongoose.Schema({
   email: {
     type: String,
   },
+  docName: {
+    type: String,
+    required: true,
+  },
   ownerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

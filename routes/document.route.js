@@ -4,15 +4,16 @@ const { documentValidation } = require("../validations/");
 const jwtVerify = require("../middlewares/jwtVerify");
 const validate = require("../middlewares/validate");
 const { limits, path, fileName, validateImage} = require("../validations/common.validations");
-const { uploadTOS3 } = require("../middlewares/s3-middleware");
+const { uploadToS3 } = require("../middlewares/s3-middleware");
 
 const router = express.Router();
 
 router.post(
   "/upload",
   jwtVerify.verifyToken,
-  uploadTOS3({
+  uploadToS3({
     limits: limits.unsignedDoc,
+    path: path.unsignedDoc,
     fileFilter: validateImage,
   }).single(fileName.unsignedDoc),
   documentController.uploadDocument
@@ -21,7 +22,7 @@ router.post(
 router.post(
   "/sign/:id",
   jwtVerify.verifyToken,
-  uploadTOS3({
+  uploadToS3({
     limits: limits.signature,
     fileFilter: validateImage,
   }).single(fileName.signature),

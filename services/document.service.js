@@ -15,7 +15,8 @@ const uploadDocument = async (req, res) => {
 
     const document = new documentModel({
       ownerId: req.userData.id,
-      unsignedDocUrl: `${req.file.location}`,
+      unsignedDocUrl: req.file.location,
+      docName: req.file.originalname
     });
     
     const savedDocument = await document.save();
