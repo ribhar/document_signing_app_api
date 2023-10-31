@@ -38,15 +38,16 @@ const deleteFileFromS3 = async (fileKey) => {
 };
 
 
-const uploadS3Object = async (object) => {
+const uploadS3Object = async (base64Data) => {
   try {
-    const signedDocName = new Date().getTime(); 
+    const signedDocName = new Date().getTime();
     const params = {
       Bucket: aws.bucket,
       Key: `${config.aws.docMediaPath}/${signedDocName}`,
-      Body: object,
+      Body: Buffer.from(base64Data, 'base64'),
       ACL: 'public-read', // Allow public read access
-      contentType : 'application/pdf'
+      ContentEncoding: 'base64', // Specify content encoding as base64
+      ContentType: 'application/pdf', // Specify the content type
     };
 
     const s3UploadResponse = await s3.upload(params).promise();
@@ -55,6 +56,7 @@ const uploadS3Object = async (object) => {
     throw new Error('Failed to upload object to S3');
   }
 };
+
 
 
 module.exports = { uploadTOS3, deleteFileFromS3 , uploadS3Object};
