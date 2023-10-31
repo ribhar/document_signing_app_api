@@ -3,11 +3,9 @@ const mongoose = require('mongoose');
 const documentSchema = new mongoose.Schema({
   signatoryName: {
     type: String,
-    // required: true,
   },
   signatoryEmail: {
     type: String,
-    // required: true,
   },
   ownerId: {
     type: mongoose.Schema.Types.ObjectId,
