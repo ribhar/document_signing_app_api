@@ -22,11 +22,6 @@ const register = async (req, res) => {
           credentials: user,
           token: user.token,
         });
-        // return res.status(201).json({
-        //   status: 200,
-        //   message: "User registered successfully.",
-        //   credentials: user,
-        // });
       } catch (error) {
 
         return res.status(500).json({ message: "Registration failed" });
