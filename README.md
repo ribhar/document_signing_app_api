@@ -80,7 +80,7 @@ The API server will be running on http://localhost:3000.
     {
       "username": "user1", // Should be alphanumeric, example: "user1", "user2"
       "email": "user@example.com",
-      "password": "examplepassword" //  The password must consist of 8 to 15 characters and include at least one number, one uppercase letter, and one lowercase letter.
+      "password": "Password@123" //  The password must consist of 8 to 15 characters and include at least one number, one uppercase letter, and one lowercase letter.
     }
     ```
   - Sample Response (Success):
