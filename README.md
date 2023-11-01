@@ -78,9 +78,9 @@ The API server will be running on http://localhost:3000.
   - Sample Request Body:
     ```json
     {
-      "username": "exampleuser",
+      "username": "user1", // Should be alphanumeric, example: "user1", "user2"
       "email": "user@example.com",
-      "password": "examplepassword"
+      "password": "examplepassword" //  The password must consist of 8 to 15 characters and include at least one number, one uppercase letter, and one lowercase letter.
     }
     ```
   - Sample Response (Success):
